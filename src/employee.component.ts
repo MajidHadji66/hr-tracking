@@ -1,0 +1,103 @@
+import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { GoogleGenAI } from '@google/genai';
+import { DataService } from './data.service';
+import { EmployeeCourse, FullEmployee } from './models';
+import { MatCardModule } from '@angular/material/card';
+import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  selector: 'app-employee',
+  templateUrl: './employee.component.html',
+  imports: [
+    RouterLink,
+    MatCardModule,
+    MatListModule,
+    MatDividerModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class EmployeeComponent {
+  private readonly dataService = inject(DataService);
+
+  id = input.required<string>();
+
+  employee = signal<FullEmployee | null>(null);
+  courses = signal<EmployeeCourse[]>([]);
+
+  // For AI Training Analysis
+  isAnalyzing = signal(false);
+  analysisResult = signal('');
+  analysisError = signal('');
+
+  hasApiKey = signal(!!process.env.API_KEY);
+
+  constructor() {
+    effect(() => {
+      const employeeId = parseInt(this.id(), 10);
+      if (!isNaN(employeeId)) {
+        this.employee.set(this.dataService.getEmployeeFullDetailsById(employeeId));
+        this.courses.set(this.dataService.getEmployeeCourses(employeeId));
+      } else {
+        this.employee.set(null);
+        this.courses.set([]);
+      }
+    });
+  }
+
+  async analyzeTraining(): Promise<void> {
+    const emp = this.employee();
+    if (!emp || !process.env.API_KEY) {
+      this.analysisError.set('Cannot analyze training without employee data or API Key.');
+      return;
+    }
+
+    this.isAnalyzing.set(true);
+    this.analysisError.set('');
+    this.analysisResult.set('');
+
+    const trainingStatusText = this.courses()
+      .map(course => `- ${course.name}: ${course.status}`)
+      .join('\n');
+
+    const prompt = `
+      You are an expert HR assistant. Your tone is professional, encouraging, and clear.
+      Analyze the following training data for an employee and provide a brief summary in HTML format within a single <p> tag.
+      The summary is for a performance review.
+      Start by mentioning the employee's progress (e.g., "John has completed 2 of 3 required courses.").
+      If all courses are complete, commend the employee for their diligence.
+      If any courses are pending, list them clearly in a bulleted list using <ul> and <li> tags within the main <p> tag.
+      Conclude with an encouraging sentence.
+
+      Employee Name: ${emp.firstName} ${emp.lastName}
+      Position: ${emp.position.title}
+      Department: ${emp.department.name}
+
+      Training Status:
+      ${trainingStatusText}
+
+      Please provide the HTML summary below.
+    `;
+
+    try {
+      const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+      });
+      this.analysisResult.set(response.text);
+    } catch (e) {
+      console.error(e);
+      this.analysisError.set('Failed to generate analysis from the Gemini API. Please check the console.');
+    } finally {
+      this.isAnalyzing.set(false);
+    }
+  }
+}

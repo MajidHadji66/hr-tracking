@@ -1,0 +1,117 @@
+@if (employee()) {
+  @let emp = employee()!;
+  <div class="space-y-8 animate-fade-in">
+    <!-- Employee Details Card -->
+    <mat-card>
+      <mat-card-content class="!p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <div class="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6">
+            <div class="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center">
+              <span class="text-4xl font-bold text-blue-600">{{ emp.firstName[0] }}{{ emp.lastName[0] }}</span>
+            </div>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800">{{ emp.firstName }} {{ emp.lastName }}</h1>
+            <p class="text-lg text-gray-600">{{ emp.position.title }} - {{ emp.department.name }}</p>
+            <p class="text-sm text-gray-500 mt-2">Hire Date: {{ emp.hireDate }}</p>
+            <p class="text-sm text-gray-500 mt-1 flex items-center gap-2">
+              <mat-icon class="!w-4 !h-4">location_on</mat-icon>
+              <span>{{ emp.address1 }}, {{ emp.city }}, {{ emp.state }} {{ emp.postal }}</span>
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Training Courses Card -->
+    <mat-card>
+      <mat-card-header class="!p-6">
+        <mat-card-title class="!text-2xl !font-bold text-gray-800">Required Training</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="!p-0">
+        <mat-list>
+          @for (course of courses(); track course.id) {
+            <mat-list-item>
+              <div matListItemTitle class="!font-semibold text-gray-800">{{ course.name }}</div>
+              <div matListItemLine class="!text-sm !text-gray-500">{{ course.description }}</div>
+              <div matListItemMeta>
+                @if (course.status === 'Completed') {
+                  <div class="text-right">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                      Completed
+                    </span>
+                    <p class="text-xs text-gray-500 mt-1">{{ course.completionDate }}</p>
+                  </div>
+                } @else {
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                      Pending
+                  </span>
+                }
+              </div>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+          }
+        </mat-list>
+        @if (courses().length === 0) {
+          <p class="text-gray-500 p-6">No required courses found for this position.</p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Gemini AI Analysis Card -->
+    <mat-card>
+      <mat-card-content class="!p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800">AI Training Analysis</h2>
+            <p class="text-gray-600 mt-1">Powered by Gemini</p>
+          </div>
+          <button 
+            mat-raised-button
+            color="primary"
+            (click)="analyzeTraining()" 
+            [disabled]="isAnalyzing() || !hasApiKey()"
+            class="mt-4 sm:mt-0">
+            @if (isAnalyzing()) {
+              <div class="flex items-center">
+                <mat-progress-spinner mode="indeterminate" diameter="20" class="mr-3"></mat-progress-spinner>
+                <span>Analyzing...</span>
+              </div>
+            } @else {
+              <span>Analyze Training</span>
+            }
+          </button>
+        </div>
+
+        <div class="mt-6 border-t pt-6">
+          @if (!hasApiKey()) {
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+              <p class="font-bold">API Key Not Found</p>
+              <p>Please configure your Gemini API key as an environment variable to use this feature.</p>
+            </div>
+          } @else if (analysisError()) {
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+              <p class="font-bold">Analysis Failed</p>
+              <p>{{ analysisError() }}</p>
+            </div>
+          } @else if (analysisResult()) {
+            <div class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded-md">
+              <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+                ✨ Summary
+              </h3>
+              <p [innerHTML]="analysisResult()"></p>
+            </div>
+          } @else {
+            <p class="text-gray-500 italic">Click the "Analyze Training" button to generate a summary of this employee's training status.</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+} @else {
+  <div class="text-center py-10">
+    <h2 class="text-2xl font-semibold text-gray-700">Employee Not Found</h2>
+    <p class="text-gray-500 mt-2">The requested employee could not be found.</p>
+    <a mat-raised-button color="primary" routerLink="/" class="mt-6">Go to Home</a>
+  </div>
+}

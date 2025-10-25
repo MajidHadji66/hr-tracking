@@ -1,0 +1,56 @@
+<div class="max-w-4xl mx-auto text-center animate-fade-in">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">Welcome to the HR Training Tracker</h1>
+  <p class="text-lg text-gray-600 mb-10">Your central hub for managing and tracking professional development.</p>
+
+  <div class="grid md:grid-cols-2 gap-8 text-left">
+    
+    <!-- Admin View Card -->
+    <mat-card class="!p-6">
+      <mat-card-header>
+        <mat-icon mat-card-avatar color="primary" class="!flex !items-center !justify-center">assessment</mat-icon>
+        <mat-card-title class="!text-2xl !font-bold">Admin Dashboard</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="!pt-4">
+        <p class="text-gray-600 mb-6">Oversee and manage training progress for all employees across the organization.</p>
+      </mat-card-content>
+      <mat-card-actions class="!p-0">
+        <a mat-raised-button color="primary" routerLink="/admin" class="w-full">
+          View Dashboard
+        </a>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Employee View Card -->
+    <mat-card class="!p-6">
+      <mat-card-header>
+        <mat-icon mat-card-avatar color="accent" class="!flex !items-center !justify-center">person</mat-icon>
+        <mat-card-title class="!text-2xl !font-bold">My Training Portal</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="!pt-4">
+        <p class="text-gray-600 mb-6">Select your name to view your required courses, track your progress, and discover new learning opportunities.</p>
+      
+        <div class="space-y-4">
+          <mat-form-field class="w-full">
+            <mat-label>Select your profile</mat-label>
+            <mat-select (selectionChange)="selectedEmployeeId.set($event.value)">
+              @for (employee of employees(); track employee.id) {
+                <mat-option [value]="employee.id">{{ employee.firstName }} {{ employee.lastName }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+       <mat-card-actions class="!p-0">
+        <button 
+          mat-raised-button
+          color="accent"
+          (click)="viewMyTraining()" 
+          [disabled]="!selectedEmployeeId()"
+          class="w-full">
+          View My Training
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+  </div>
+</div>

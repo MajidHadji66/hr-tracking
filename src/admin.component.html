@@ -1,0 +1,76 @@
+<mat-card class="animate-fade-in">
+  <mat-card-header class="!flex-col items-start">
+    <mat-card-title class="!text-3xl !font-bold text-gray-800">Admin Dashboard</mat-card-title>
+    <mat-card-subtitle class="!text-base text-gray-600 mt-1">Overview of employee training progress and available courses.</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content class="pt-6">
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Employee Progress</h2>
+      <div class="overflow-x-auto mat-elevation-z2 rounded-lg">
+        <table mat-table [dataSource]="employees()">
+          
+          <ng-container matColumnDef="employee">
+            <th mat-header-cell *matHeaderCellDef>Employee</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="font-medium">{{element.firstName}} {{element.lastName}}</div>
+              <div class="text-xs text-gray-500">{{element.email}}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="position">
+            <th mat-header-cell *matHeaderCellDef>Position</th>
+            <td mat-cell *matCellDef="let element"> {{element.position.title}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="department">
+            <th mat-header-cell *matHeaderCellDef>Department</th>
+            <td mat-cell *matCellDef="let element"> {{element.department.name}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="completion">
+            <th mat-header-cell *matHeaderCellDef class="w-1/3">Completion</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="flex items-center">
+                <mat-progress-bar class="flex-grow mr-3" mode="determinate" [value]="element.completionPercentage"></mat-progress-bar>
+                <span class="font-medium text-sm">{{ element.completionPercentage.toFixed(0) }}%</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 cursor-pointer" (click)="viewEmployee(row.id)"></tr>
+
+          @if (employees().length === 0) {
+            <tr class="mat-row">
+              <td class="mat-cell text-center py-6 text-gray-500" [attr.colspan]="displayedColumns.length">
+                No employee data available.
+              </td>
+            </tr>
+          }
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <mat-accordion>
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="!text-2xl !font-bold text-gray-800">
+              Available Training Courses
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="mt-4 space-y-4">
+            @for (course of courses(); track course.id) {
+              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md hover:border-blue-300 transition-all duration-200">
+                <h3 class="font-semibold text-lg text-gray-800">{{ course.name }}</h3>
+                <p class="text-gray-600 mt-1">{{ course.description }}</p>
+              </div>
+            } @empty {
+              <p class="text-gray-500">No courses available.</p>
+            }
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </section>
+  </mat-card-content>
+</mat-card>
