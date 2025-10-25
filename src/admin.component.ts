@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from './data.service';
-import { FullEmployee, Course } from './models';
+import { FullEmployee, CourseWithAssignments } from './models';
 import { CommonModule, DecimalPipe } from '@angular/common';
 
 // Angular Material Modules
@@ -11,6 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 
 type SortableKeys = 'name' | 'position' | 'department' | 'completion';
 
@@ -27,6 +28,7 @@ type SortableKeys = 'name' | 'position' | 'department' | 'completion';
     MatCardModule,
     MatExpansionModule,
     MatButtonModule,
+    MatDividerModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -34,7 +36,7 @@ export class AdminComponent {
   private readonly dataService = inject(DataService);
 
   employees = signal<FullEmployee[]>([]);
-  courses = signal<Course[]>([]);
+  coursesWithAssignments = signal<CourseWithAssignments[]>([]);
   filterTerm = signal('');
   sortColumn = signal<SortableKeys>('name');
   sortDirection = signal<'asc' | 'desc'>('asc');
@@ -83,7 +85,13 @@ export class AdminComponent {
 
   constructor() {
     this.employees.set(this.dataService.getAllEmployeesFullDetails());
-    this.courses.set(this.dataService.getAllCourses());
+    
+    const allCourses = this.dataService.getAllCourses();
+    const assignments = allCourses.map(course => ({
+      ...course,
+      assignedEmployees: this.dataService.getEmployeesForCourse(course.id)
+    }));
+    this.coursesWithAssignments.set(assignments);
   }
 
   applyFilter(event: Event) {

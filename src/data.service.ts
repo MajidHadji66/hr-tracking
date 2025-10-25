@@ -1,6 +1,6 @@
 import { Injectable, computed } from '@angular/core';
 import { employees, positions, departments, courses, positionCourses, employeeTrainings } from './data';
-import { Course, EmployeeCourse, FullEmployee } from './models';
+import { Course, Employee, EmployeeCourse, FullEmployee } from './models';
 
 @Injectable({
   providedIn: 'root'
@@ -64,5 +64,13 @@ export class DataService {
 
   getAllCourses(): Course[] {
     return courses;
+  }
+
+  getEmployeesForCourse(courseId: number): Employee[] {
+    const requiredPositionIds = positionCourses
+      .filter(pc => pc.courseId === courseId)
+      .map(pc => pc.positionId);
+    
+    return employees.filter(emp => requiredPositionIds.includes(emp.positionId));
   }
 }

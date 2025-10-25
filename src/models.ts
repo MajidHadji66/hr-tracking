@@ -51,3 +51,7 @@ export interface EmployeeCourse extends Course {
   completionDate: string | null;
   status: 'Completed' | 'Pending';
 }
+
+export interface CourseWithAssignments extends Course {
+  assignedEmployees: Employee[];
+}
