@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { DataService } from './data.service';
 import { Employee } from './models';
@@ -23,12 +24,8 @@ export class HomeComponent {
   private readonly dataService = inject(DataService);
   private readonly router = inject(Router);
 
-  employees = signal<Employee[]>([]);
+  employees = toSignal(this.dataService.getAllEmployees(), { initialValue: [] });
   selectedEmployeeId = signal<string>('');
-
-  constructor() {
-    this.employees.set(this.dataService.getAllEmployees());
-  }
 
   viewMyTraining(): void {
     const id = this.selectedEmployeeId();

@@ -1,164 +1,174 @@
 <div class="p-4 md:p-8">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title class="!text-3xl">Admin Dashboard</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
+  <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      <section class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Employee Progress</h2>
+  <mat-tab-group animationDuration="0ms">
+    <!-- Employee Progress Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="mr-2">groups</mat-icon>
+        <span>Employee Progress</span>
+      </ng-template>
+      <div class="p-4">
         <mat-form-field class="w-full">
           <mat-label>Filter Employees</mat-label>
-          <input matInput (keyup)="applyFilter($event)" placeholder="Ex. John Doe, IT, etc." #input>
-          <mat-icon matSuffix>search</mat-icon>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Ex. John Doe" #input>
         </mat-form-field>
 
-        <div class="border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
-          <table class="w-full text-left text-sm text-gray-600">
-            <thead class="bg-gray-50 text-xs text-gray-700 uppercase tracking-wider">
-              <tr>
-                <th scope="col" class="px-6 py-3 cursor-pointer hover:bg-gray-100" (click)="sortData('name')">
-                  <div class="flex items-center gap-2">
+        <div class="mat-elevation-z8 overflow-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="p-4 text-left font-semibold cursor-pointer" (click)="sortData('name')">
+                  <div class="flex items-center">
                     Name
-                    <span class="inline-flex items-center justify-center w-4 h-4">
-                      <mat-icon class="!text-base" [class.text-gray-400]="sortColumn() !== 'name'">
-                        @if (sortColumn() === 'name') {
-                          {{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                    <span class="w-6 h-6 ml-1 flex items-center justify-center">
+                      @if (sortColumn() === 'name') {
+                        @if (sortDirection() === 'asc') {
+                          <mat-icon>arrow_upward</mat-icon>
                         } @else {
-                          unfold_more
+                          <mat-icon>arrow_downward</mat-icon>
                         }
-                      </mat-icon>
+                      } @else {
+                        <mat-icon class="text-gray-400">unfold_more</mat-icon>
+                      }
                     </span>
                   </div>
                 </th>
-                <th scope="col" class="px-6 py-3 cursor-pointer hover:bg-gray-100" (click)="sortData('position')">
-                  <div class="flex items-center gap-2">
-                    Position
-                     <span class="inline-flex items-center justify-center w-4 h-4">
-                      <mat-icon class="!text-base" [class.text-gray-400]="sortColumn() !== 'position'">
-                        @if (sortColumn() === 'position') {
-                          {{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
-                        } @else {
-                          unfold_more
-                        }
-                      </mat-icon>
-                    </span>
-                  </div>
-                </th>
-                <th scope="col" class="px-6 py-3 cursor-pointer hover:bg-gray-100" (click)="sortData('department')">
-                   <div class="flex items-center gap-2">
-                    Department
-                    <span class="inline-flex items-center justify-center w-4 h-4">
-                      <mat-icon class="!text-base" [class.text-gray-400]="sortColumn() !== 'department'">
-                        @if (sortColumn() === 'department') {
-                          {{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
-                        } @else {
-                          unfold_more
-                        }
-                      </mat-icon>
-                    </span>
-                  </div>
-                </th>
-                <th scope="col" class="px-6 py-3 cursor-pointer hover:bg-gray-100" (click)="sortData('completion')">
-                  <div class="flex items-center gap-2">
-                    Training Completion
-                    <span class="inline-flex items-center justify-center w-4 h-4">
-                      <mat-icon class="!text-base" [class.text-gray-400]="sortColumn() !== 'completion'">
-                        @if (sortColumn() === 'completion') {
-                          {{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
-                        } @else {
-                          unfold_more
-                        }
-                      </mat-icon>
-                    </span>
-                  </div>
-                </th>
-                <th scope="col" class="px-6 py-3">
-                  Actions
-                </th>
+                <th class="p-4 text-left font-semibold">Position</th>
+                <th class="p-4 text-left font-semibold">Progress</th>
+                <th class="p-4 text-left font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              @for (employee of filteredAndSortedEmployees(); track employee.id) {
-                <tr class="bg-white border-b hover:bg-gray-50">
-                  <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {{employee.firstName}} {{employee.lastName}}
-                  </td>
-                  <td class="px-6 py-4">
-                    {{employee.position.title}}
-                  </td>
-                  <td class="px-6 py-4">
-                    {{employee.department.name}}
-                  </td>
-                  <td class="px-6 py-4">
+              @for (employee of filteredEmployees(); track employee.id) {
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="p-4">{{ employee.firstName }} {{ employee.lastName }}</td>
+                  <td class="p-4">{{ employee.position.title }}</td>
+                  <td class="p-4">
                     <div class="flex items-center">
-                      <mat-progress-bar class="w-24 mr-2" mode="determinate" [value]="employee.completionPercentage"></mat-progress-bar>
-                      <span>{{employee.completionPercentage | number:'1.0-0'}}%</span>
+                      <div class="w-24">
+                        <mat-progress-bar mode="determinate" [value]="employee.completionPercentage"></mat-progress-bar>
+                      </div>
+                      <span class="ml-3 text-sm font-medium">{{ employee.completionPercentage.toFixed(0) }}%</span>
                     </div>
                   </td>
-                  <td class="px-6 py-4">
-                    <a mat-icon-button [routerLink]="['/employee', employee.id]" title="View Details">
-                      <mat-icon>visibility</mat-icon>
-                    </a>
+                  <td class="p-4">
+                    <a mat-button color="primary" [routerLink]="['/employee', employee.id]">View Details</a>
                   </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="5" class="text-center p-6 text-gray-500">
-                    @if (filterTerm()) {
-                      <span>No data matching the filter "{{filterTerm()}}"</span>
-                    } @else {
-                      <span>No employee data available.</span>
-                    }
+                  <td colspan="4" class="p-8 text-center text-gray-500">
+                    No employees found.
                   </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
-      </section>
+      </div>
+    </mat-tab>
 
-      <section>
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Available Training Courses & Assignments</h2>
-        <mat-accordion multi>
-          @for (course of coursesWithAssignments(); track course.id) {
-            <mat-expansion-panel class="!bg-white !shadow-sm hover:!shadow-md transition-shadow duration-200 mb-2 border border-gray-200">
-              <mat-expansion-panel-header>
-                <mat-panel-title class="!font-semibold !text-lg !text-gray-800">
-                  {{ course.name }}
-                </mat-panel-title>
-                <mat-panel-description class="!text-sm !text-gray-600 !justify-end">
-                  {{ course.assignedEmployees.length }} employee(s) assigned
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-              
-              <p class="text-gray-600 text-sm mb-4 px-6">{{ course.description }}</p>
+    <!-- Course Management Tab -->
+    <mat-tab>
+       <ng-template mat-tab-label>
+        <mat-icon class="mr-2">assignment</mat-icon>
+        <span>Course Management</span>
+      </ng-template>
+       <div class="p-4">
+         @if(selectedCourse(); as course) {
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <!-- Assignment Management -->
+              <mat-card>
+                <mat-card-header>
+                  <mat-card-title>Manage Assignments for: {{ course.name }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content [formGroup]="assignmentForm">
+                  <p class="text-gray-600 mb-4">{{ course.description }}</p>
 
-              <mat-divider></mat-divider>
+                  <!-- Position Assignments -->
+                  <mat-form-field class="w-full mb-4">
+                    <mat-label>Assign to Positions</mat-label>
+                    <mat-select multiple formControlName="positions">
+                      @for (position of positions(); track position.id) {
+                        <mat-option [value]="position.id">{{ position.title }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
 
-              <div class="p-4">
-                <h4 class="font-semibold text-gray-700 mb-2">Assigned Employees:</h4>
-                @if (course.assignedEmployees.length > 0) {
-                  <ul class="list-disc list-inside text-gray-600 space-y-1">
-                    @for (employee of course.assignedEmployees; track employee.id) {
-                      <li>
-                        <a [routerLink]="['/employee', employee.id]" class="text-blue-600 hover:underline">
-                          {{ employee.firstName }} {{ employee.lastName }}
-                        </a>
-                      </li>
+                  <!-- Employee Assignments -->
+                  <mat-form-field class="w-full">
+                    <mat-label>Assign to Specific Employees</mat-label>
+                    <mat-select multiple formControlName="employees">
+                        @for (employee of employees(); track employee.id) {
+                        <mat-option [value]="employee.id">{{ employee.firstName }} {{ employee.lastName }}</mat-option>
+                      }
+                    </mat-select>
+                    <mat-hint>Use for exceptions or individual requirements.</mat-hint>
+                  </mat-form-field>
+                </mat-card-content>
+                <mat-card-actions class="px-4 pb-4">
+                  <button mat-flat-button color="primary" (click)="saveAssignments()" [disabled]="isSaving() || assignmentForm.pristine">
+                    @if (isSaving()) {
+                      <mat-spinner [diameter]="20" class="inline-block mr-2"></mat-spinner>
+                      Saving...
+                    } @else {
+                      Save Assignments
                     }
-                  </ul>
-                } @else {
-                  <p class="text-gray-500 italic">No employees are assigned to this course based on their position.</p>
-                }
-              </div>
-            </mat-expansion-panel>
-          } @empty {
-            <p class="text-gray-500 p-4">No courses available.</p>
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+
+              <!-- Current Assignments -->
+              <mat-card>
+                <mat-card-header>
+                  <mat-card-title>Current Trainees</mat-card-title>
+                  <mat-card-subtitle>Employees required to take this course.</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  @if (assignedEmployees().length > 0) {
+                    <mat-list>
+                      @for (employee of assignedEmployees(); track employee.id) {
+                        <mat-list-item>
+                          <mat-icon matListItemIcon>person</mat-icon>
+                          <div matListItemTitle>{{ employee.firstName }} {{ employee.lastName }}</div>
+                          <div matListItemLine>{{ employee.email }}</div>
+                        </mat-list-item>
+                      }
+                    </mat-list>
+                  } @else {
+                    <p class="text-gray-500">No employees are currently assigned to this course.</p>
+                  }
+                </mat-card-content>
+              </mat-card>
+            </div>
+          } @else {
+            <mat-card class="mb-8">
+              <mat-card-header>
+                <mat-card-title>Select a Course</mat-card-title>
+                <mat-card-subtitle>Select a course to view and manage its assignments.</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <mat-form-field class="w-full">
+                  <mat-label>Select a Course</mat-label>
+                  <mat-select (selectionChange)="onCourseSelectionChange($event.value)">
+                    @for (course of courses(); track course.id) {
+                      <mat-option [value]="course.id">{{ course.name }}</mat-option>
+                    } @empty {
+                       <mat-option disabled>No courses available</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </mat-card-content>
+            </mat-card>
           }
-        </mat-accordion>
-      </section>
-      
-    </mat-card-content>
-  </mat-card>
+
+          @if (isLoadingCourseDetails()) {
+            <div class="flex justify-center items-center p-8">
+              <mat-spinner></mat-spinner>
+            </div>
+          }
+       </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>

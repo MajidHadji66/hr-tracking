@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+// FIX: Add signal to imports from @angular/core
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { GoogleGenAI } from '@google/genai';
 import { DataService } from './data.service';
@@ -9,6 +11,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { filter, switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-employee',
@@ -28,9 +31,33 @@ export class EmployeeComponent {
   private readonly dataService = inject(DataService);
 
   id = input.required<string>();
+  
+  // Reactive stream that fetches data when the employee ID changes
+  private employeeData$ = toObservable(this.id).pipe(
+    filter(id => !!id),
+    switchMap(id => {
+      const employeeId = parseInt(id, 10);
+      if (!isNaN(employeeId)) {
+        return this.dataService.getEmployeeFullDetailsById(employeeId);
+      }
+      return of(null); // Return an observable of null if ID is invalid
+    })
+  );
 
-  employee = signal<FullEmployee | null>(null);
-  courses = signal<EmployeeCourse[]>([]);
+  private courseData$ = toObservable(this.id).pipe(
+    filter(id => !!id),
+    switchMap(id => {
+      const employeeId = parseInt(id, 10);
+      if (!isNaN(employeeId)) {
+        return this.dataService.getEmployeeCourses(employeeId);
+      }
+      return of([]); // Return an observable of empty array
+    })
+  );
+  
+  employee = toSignal(this.employeeData$);
+  courses = toSignal(this.courseData$, { initialValue: [] });
+
 
   // For AI Training Analysis
   isAnalyzing = signal(false);
@@ -38,19 +65,6 @@ export class EmployeeComponent {
   analysisError = signal('');
 
   hasApiKey = signal(!!process.env.API_KEY);
-
-  constructor() {
-    effect(() => {
-      const employeeId = parseInt(this.id(), 10);
-      if (!isNaN(employeeId)) {
-        this.employee.set(this.dataService.getEmployeeFullDetailsById(employeeId));
-        this.courses.set(this.dataService.getEmployeeCourses(employeeId));
-      } else {
-        this.employee.set(null);
-        this.courses.set([]);
-      }
-    });
-  }
 
   async analyzeTraining(): Promise<void> {
     const emp = this.employee();

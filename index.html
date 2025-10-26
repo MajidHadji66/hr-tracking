@@ -9,39 +9,43 @@
   <link href="https://cdn.jsdelivr.net/npm/@angular/material@20.2.10/prebuilt-themes/indigo-pink.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="importmap">
-  {
-    "imports": {
-      "rxjs": "https://aistudiocdn.com/rxjs@^7.8.2?conditions=es2015",
-      "rxjs/operators": "https://aistudiocdn.com/rxjs@^7.8.2/operators?conditions=es2015",
-      "rxjs/ajax": "https://aistudiocdn.com/rxjs@^7.8.2/ajax?conditions=es2015",
-      "rxjs/webSocket": "https://aistudiocdn.com/rxjs@^7.8.2/webSocket?conditions=es2015",
-      "rxjs/testing": "https://aistudiocdn.com/rxjs@^7.8.2/testing?conditions=es2015",
-      "rxjs/fetch": "https://aistudiocdn.com/rxjs@^7.8.2/fetch?conditions=es2015",
-      "@angular/common": "https://next.esm.sh/@angular/common@^20.3.7?external=rxjs",
-      "@google/genai": "https://next.esm.sh/@google/genai@^1.27.0?external=rxjs",
-      "@angular/platform-browser/animations": "https://next.esm.sh/@angular/platform-browser@^20.3.7/animations?external=rxjs",
-      "@angular/platform-browser": "https://next.esm.sh/@angular/platform-browser@^20.3.7?external=rxjs",
-      "@angular/compiler": "https://next.esm.sh/@angular/compiler@^20.3.7?external=rxjs",
-      "@angular/core": "https://next.esm.sh/@angular/core@^20.3.7?external=rxjs",
-      "@angular/router": "https://next.esm.sh/@angular/router@^20.3.7?external=rxjs",
-      "@angular/material/select": "https://next.esm.sh/@angular/material@^20.2.10/select?external=rxjs",
-      "@angular/material/progress-spinner": "https://next.esm.sh/@angular/material@^20.2.10/progress-spinner?external=rxjs",
-      "@angular/material/divider": "https://next.esm.sh/@angular/material@^20.2.10/divider?external=rxjs",
-      "@angular/material/list": "https://next.esm.sh/@angular/material@^20.2.10/list?external=rxjs",
-      "@angular/material/button": "https://next.esm.sh/@angular/material@^20.2.10/button?external=rxjs",
-      "@angular/material/progress-bar": "https://next.esm.sh/@angular/material@^20.2.10/progress-bar?external=rxjs",
-      "@angular/material/icon": "https://next.esm.sh/@angular/material@^20.2.10/icon?external=rxjs",
-      "@angular/material/input": "https://next.esm.sh/@angular/material@^20.2.10/input?external=rxjs",
-      "@angular/material/form-field": "https://next.esm.sh/@angular/material@^20.2.10/form-field?external=rxjs",
-      "@angular/material/sort": "https://next.esm.sh/@angular/material@^20.2.10/sort?external=rxjs",
-      "@angular/material/table": "https://next.esm.sh/@angular/material@^20.2.10/table?external=rxjs",
-      "@angular/cdk/table": "https://next.esm.sh/@angular/cdk@^20.2.10/table?external=rxjs",
-      "@angular/material/card": "https://next.esm.sh/@angular/material@^20.2.10/card?external=rxjs",
-      "@angular/material/toolbar": "https://next.esm.sh/@angular/material@^20.2.10/toolbar?external=rxjs",
-      "@angular/material/expansion": "https://next.esm.sh/@angular/material@^20.2.10/expansion?external=rxjs"
-    }
+{
+  "imports": {
+    "rxjs": "https://aistudiocdn.com/rxjs@^7.8.2?conditions=es2015",
+    "rxjs/operators": "https://aistudiocdn.com/rxjs@^7.8.2/operators?conditions=es2015",
+    "rxjs/ajax": "https://aistudiocdn.com/rxjs@^7.8.2/ajax?conditions=es2015",
+    "rxjs/webSocket": "https://aistudiocdn.com/rxjs@^7.8.2/webSocket?conditions=es2015",
+    "rxjs/testing": "https://aistudiocdn.com/rxjs@^7.8.2/testing?conditions=es2015",
+    "rxjs/fetch": "https://aistudiocdn.com/rxjs@^7.8.2/fetch?conditions=es2015",
+    "@angular/common": "https://next.esm.sh/@angular/common@^20.3.7?external=rxjs",
+    "@google/genai": "https://next.esm.sh/@google/genai@^1.27.0?external=rxjs",
+    "@angular/platform-browser/animations": "https://next.esm.sh/@angular/platform-browser@^20.3.7/animations?external=rxjs",
+    "@angular/platform-browser": "https://next.esm.sh/@angular/platform-browser@^20.3.7?external=rxjs",
+    "@angular/compiler": "https://next.esm.sh/@angular/compiler@^20.3.7?external=rxjs",
+    "@angular/core": "https://next.esm.sh/@angular/core@^20.3.7?external=rxjs",
+    "@angular/router": "https://next.esm.sh/@angular/router@^20.3.7?external=rxjs",
+    "@angular/material/select": "https://next.esm.sh/@angular/material@^20.2.10/select?external=rxjs",
+    "@angular/material/progress-spinner": "https://next.esm.sh/@angular/material@^20.2.10/progress-spinner?external=rxjs",
+    "@angular/material/divider": "https://next.esm.sh/@angular/material@^20.2.10/divider?external=rxjs",
+    "@angular/material/list": "https://next.esm.sh/@angular/material@^20.2.10/list?external=rxjs",
+    "@angular/material/button": "https://next.esm.sh/@angular/material@^20.2.10/button?external=rxjs",
+    "@angular/material/progress-bar": "https://next.esm.sh/@angular/material@^20.2.10/progress-bar?external=rxjs",
+    "@angular/material/icon": "https://next.esm.sh/@angular/material@^20.2.10/icon?external=rxjs",
+    "@angular/material/input": "https://next.esm.sh/@angular/material@^20.2.10/input?external=rxjs",
+    "@angular/material/form-field": "https://next.esm.sh/@angular/material@^20.2.10/form-field?external=rxjs",
+    "@angular/material/sort": "https://next.esm.sh/@angular/material@^20.2.10/sort?external=rxjs",
+    "@angular/material/table": "https://next.esm.sh/@angular/material@^20.2.10/table?external=rxjs",
+    "@angular/cdk/table": "https://next.esm.sh/@angular/cdk@^20.2.10/table?external=rxjs",
+    "@angular/material/card": "https://next.esm.sh/@angular/material@^20.2.10/card?external=rxjs",
+    "@angular/material/toolbar": "https://next.esm.sh/@angular/material@^20.2.10/toolbar?external=rxjs",
+    "@angular/material/expansion": "https://next.esm.sh/@angular/material@^20.2.10/expansion?external=rxjs",
+    "@angular/material/tabs": "https://next.esm.sh/@angular/material@^20.2.10/tabs?external=rxjs",
+    "@angular/common/http": "https://next.esm.sh/@angular/common@^20.3.7/http?external=rxjs",
+    "@angular/core/rxjs-interop": "https://next.esm.sh/@angular/core@^20.3.7/rxjs-interop?external=rxjs",
+    "@angular/forms": "https://next.esm.sh/@angular/forms@^20.3.7?external=rxjs"
   }
-  </script>
+}
+</script>
 </head>
 <body class="mat-typography">
   <app-root></app-root>

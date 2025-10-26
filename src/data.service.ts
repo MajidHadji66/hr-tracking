@@ -1,76 +1,81 @@
-import { Injectable, computed } from '@angular/core';
-import { employees, positions, departments, courses, positionCourses, employeeTrainings } from './data';
-import { Course, Employee, EmployeeCourse, FullEmployee } from './models';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Course, Employee, EmployeeCourse, FullEmployee, Position } from './models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:3000/api'; // Base URL for the backend
 
-  getAllEmployees() {
-    return employees;
-  }
-  
-  getAllEmployeesFullDetails(): FullEmployee[] {
-    return employees.map(emp => this.getEmployeeFullDetailsById(emp.id)).filter(e => e !== null) as FullEmployee[];
-  }
-
-  getEmployeeFullDetailsById(id: number): FullEmployee | null {
-    const employee = employees.find(e => e.id === id);
-    if (!employee) return null;
-
-    const position = positions.find(p => p.id === employee.positionId);
-    if (!position) return null;
-
-    const department = departments.find(d => d.id === position.departmentId);
-    if (!department) return null;
-
-    const trainingRecords = employeeTrainings.filter(t => t.employeeId === employee.id);
-    const requiredCourseIds = positionCourses
-      .filter(pc => pc.positionId === position.id)
-      .map(pc => pc.courseId);
-      
-    const requiredCourses = courses.filter(c => requiredCourseIds.includes(c.id));
-
-    const completedCount = requiredCourses.filter(rc => 
-        trainingRecords.some(tr => tr.courseId === rc.id)
-    ).length;
-
-    const completionPercentage = requiredCourses.length > 0 ? (completedCount / requiredCourses.length) * 100 : 100;
-
-    return {
-      ...employee,
-      position,
-      department,
-      trainingRecords,
-      requiredCourses,
-      completionPercentage,
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(`${operation} failed: ${error.message}`);
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
     };
   }
 
-  getEmployeeCourses(employeeId: number): EmployeeCourse[] {
-    const employeeDetails = this.getEmployeeFullDetailsById(employeeId);
-    if (!employeeDetails) return [];
-
-    return employeeDetails.requiredCourses.map(course => {
-      const trainingRecord = employeeDetails.trainingRecords.find(tr => tr.courseId === course.id);
-      return {
-        ...course,
-        completionDate: trainingRecord ? trainingRecord.completionDate : null,
-        status: trainingRecord ? 'Completed' : 'Pending'
-      };
-    });
+  getAllEmployees(): Observable<Employee[]> {
+    return this.http.get<Employee[]>(`${this.apiUrl}/employees`).pipe(
+      catchError(this.handleError<Employee[]>('getAllEmployees', []))
+    );
+  }
+  
+  getAllEmployeesFullDetails(): Observable<FullEmployee[]> {
+    return this.http.get<FullEmployee[]>(`${this.apiUrl}/employees/details`).pipe(
+      catchError(this.handleError<FullEmployee[]>('getAllEmployeesFullDetails', []))
+    );
   }
 
-  getAllCourses(): Course[] {
-    return courses;
+  getEmployeeFullDetailsById(id: number): Observable<FullEmployee | null> {
+    return this.http.get<FullEmployee>(`${this.apiUrl}/employees/${id}/details`).pipe(
+      catchError(this.handleError<FullEmployee | null>('getEmployeeFullDetailsById', null))
+    );
   }
 
-  getEmployeesForCourse(courseId: number): Employee[] {
-    const requiredPositionIds = positionCourses
-      .filter(pc => pc.courseId === courseId)
-      .map(pc => pc.positionId);
-    
-    return employees.filter(emp => requiredPositionIds.includes(emp.positionId));
+  getEmployeeCourses(employeeId: number): Observable<EmployeeCourse[]> {
+    return this.http.get<EmployeeCourse[]>(`${this.apiUrl}/employees/${employeeId}/courses`).pipe(
+      catchError(this.handleError<EmployeeCourse[]>('getEmployeeCourses', []))
+    );
+  }
+
+  getAllCourses(): Observable<Course[]> {
+    return this.http.get<Course[]>(`${this.apiUrl}/courses`).pipe(
+      catchError(this.handleError<Course[]>('getAllCourses', []))
+    );
+  }
+
+  getAllPositions(): Observable<Position[]> {
+    return this.http.get<Position[]>(`${this.apiUrl}/positions`).pipe(
+      catchError(this.handleError<Position[]>('getAllPositions', []))
+    );
+  }
+
+  getEmployeesForCourse(courseId: number): Observable<Employee[]> {
+    return this.http.get<Employee[]>(`${this.apiUrl}/courses/${courseId}/employees`).pipe(
+      catchError(this.handleError<Employee[]>('getEmployeesForCourse', []))
+    );
+  }
+
+  getPositionIdsForCourse(courseId: number): Observable<number[]> {
+    return this.http.get<number[]>(`${this.apiUrl}/courses/${courseId}/positions`).pipe(
+      catchError(this.handleError<number[]>('getPositionIdsForCourse', []))
+    );
+  }
+
+  assignCourseToPositions(courseId: number, positionIds: number[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/assignments/positions`, { courseId, positionIds }).pipe(
+      catchError(this.handleError<any>('assignCourseToPositions'))
+    );
+  }
+
+  assignCourseToEmployees(courseId: number, employeeIds: number[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/assignments/employees`, { courseId, employeeIds }).pipe(
+      catchError(this.handleError<any>('assignCourseToEmployees'))
+    );
   }
 }
