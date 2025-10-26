@@ -70,7 +70,7 @@
             mat-raised-button
             color="primary"
             (click)="analyzeTraining()" 
-            [disabled]="isAnalyzing() || !hasApiKey()"
+            [disabled]="isAnalyzing()"
             class="mt-4 sm:mt-0">
             @if (isAnalyzing()) {
               <div class="flex items-center">
@@ -84,12 +84,7 @@
         </div>
 
         <div class="mt-6 border-t pt-6">
-          @if (!hasApiKey()) {
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-              <p class="font-bold">API Key Not Found</p>
-              <p>Please configure your Gemini API key as an environment variable to use this feature.</p>
-            </div>
-          } @else if (analysisError()) {
+          @if (analysisError()) {
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
               <p class="font-bold">Analysis Failed</p>
               <p>{{ analysisError() }}</p>

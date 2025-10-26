@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Course, Employee, EmployeeCourse, FullEmployee, Position } from './models';
 
@@ -76,6 +76,15 @@ export class DataService {
   assignCourseToEmployees(courseId: number, employeeIds: number[]): Observable<any> {
     return this.http.post(`${this.apiUrl}/assignments/employees`, { courseId, employeeIds }).pipe(
       catchError(this.handleError<any>('assignCourseToEmployees'))
+    );
+  }
+
+  analyzeTraining(prompt: string): Observable<{ analysis: string }> {
+    return this.http.post<{ analysis: string }>(`${this.apiUrl}/analyze-training`, { prompt }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        const errorMessage = error.error?.message || 'An unknown error occurred during analysis.';
+        return throwError(() => new Error(errorMessage));
+      })
     );
   }
 }

@@ -1,5 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const { GoogleGenAI } = require('@google/genai');
 const db = require('./db');
 
 const app = express();
@@ -178,6 +180,30 @@ app.post('/api/assignments/employees', (req, res) => {
     });
     
     res.status(201).json({ message: 'Assignments created successfully' });
+});
+
+// POST: Analyze training data with Gemini
+app.post('/api/analyze-training', async (req, res) => {
+    const { prompt } = req.body;
+    if (!prompt) {
+        return res.status(400).json({ message: 'Prompt is required' });
+    }
+
+    if (!process.env.API_KEY) {
+        return res.status(500).json({ message: 'API_KEY environment variable not set on the server. Please create a .env file in the /backend directory with your API key.' });
+    }
+
+    try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+        });
+        res.json({ analysis: response.text });
+    } catch (error) {
+        console.error('Gemini API error:', error);
+        res.status(500).json({ message: 'Failed to generate analysis from the Gemini API.' });
+    }
 });
 
 app.listen(port, () => {

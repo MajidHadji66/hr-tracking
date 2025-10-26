@@ -2,7 +2,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { GoogleGenAI } from '@google/genai';
 import { DataService } from './data.service';
 import { EmployeeCourse, FullEmployee } from './models';
 import { MatCardModule } from '@angular/material/card';
@@ -35,7 +34,8 @@ export class EmployeeComponent {
   // Reactive stream that fetches data when the employee ID changes
   private employeeData$ = toObservable(this.id).pipe(
     filter(id => !!id),
-    switchMap(id => {
+    // FIX: Explicitly type `id` as string to resolve type inference issue with `parseInt`.
+    switchMap((id: string) => {
       const employeeId = parseInt(id, 10);
       if (!isNaN(employeeId)) {
         return this.dataService.getEmployeeFullDetailsById(employeeId);
@@ -46,7 +46,8 @@ export class EmployeeComponent {
 
   private courseData$ = toObservable(this.id).pipe(
     filter(id => !!id),
-    switchMap(id => {
+    // FIX: Explicitly type `id` as string to resolve type inference issue with `parseInt`.
+    switchMap((id: string) => {
       const employeeId = parseInt(id, 10);
       if (!isNaN(employeeId)) {
         return this.dataService.getEmployeeCourses(employeeId);
@@ -64,12 +65,10 @@ export class EmployeeComponent {
   analysisResult = signal('');
   analysisError = signal('');
 
-  hasApiKey = signal(!!process.env.API_KEY);
-
-  async analyzeTraining(): Promise<void> {
+  analyzeTraining(): void {
     const emp = this.employee();
-    if (!emp || !process.env.API_KEY) {
-      this.analysisError.set('Cannot analyze training without employee data or API Key.');
+    if (!emp) {
+      this.analysisError.set('Cannot analyze training without employee data.');
       return;
     }
 
@@ -100,18 +99,16 @@ export class EmployeeComponent {
       Please provide the HTML summary below.
     `;
 
-    try {
-      const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
-      this.analysisResult.set(response.text);
-    } catch (e) {
-      console.error(e);
-      this.analysisError.set('Failed to generate analysis from the Gemini API. Please check the console.');
-    } finally {
-      this.isAnalyzing.set(false);
-    }
+    this.dataService.analyzeTraining(prompt).subscribe({
+      next: (response) => {
+        this.analysisResult.set(response.analysis);
+        this.isAnalyzing.set(false);
+      },
+      error: (err: Error) => {
+        console.error(err);
+        this.analysisError.set(err.message);
+        this.isAnalyzing.set(false);
+      }
+    });
   }
 }
